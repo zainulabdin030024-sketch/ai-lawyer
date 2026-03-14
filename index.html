@@ -994,7 +994,12 @@ async function sendMessage() {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': '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',
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
