@@ -773,16 +773,16 @@
     <div style="font-size:44px; margin-bottom:12px;">🔑</div>
     <h2 style="font-family:Georgia,serif; color:#c9a84c; font-size:20px; margin-bottom:8px;">API Key Daalen</h2>
     <p style="color:#9a9488; font-size:13px; margin-bottom:4px;">آپ کی Anthropic API Key درج کریں</p>
-    <p style="color:#666; font-size:11px; margin-bottom:16px;">console.anthropic.com se key copy karein</p>
-    <input id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." style="width:100%; background:#0d0d0f; border:1px solid rgba(201,168,76,0.25); border-radius:8px; padding:11px 14px; color:#e8e4d8; font-size:12px; outline:none; margin-bottom:8px; font-family:monospace; box-sizing:border-box;" />
-    <div id="apiKeyError" style="display:none; color:#e07070; font-size:12px; margin-bottom:8px;">⚠️ Galat key — sk-ant- se shuru honi chahiye</div>
+    <p style="color:#666; font-size:11px; margin-bottom:16px;">console.groq.com se FREE key copy karein</p>
+    <input id="apiKeyInput" type="password" placeholder="gsk_..." style="width:100%; background:#0d0d0f; border:1px solid rgba(201,168,76,0.25); border-radius:8px; padding:11px 14px; color:#e8e4d8; font-size:12px; outline:none; margin-bottom:8px; font-family:monospace; box-sizing:border-box;" />
+    <div id="apiKeyError" style="display:none; color:#e07070; font-size:12px; margin-bottom:8px;">⚠️ Galat key — gsk_ se shuru honi chahiye</div>
     <button onclick="saveApiKey()" style="width:100%; padding:11px; background:linear-gradient(135deg,#8a6f2e,#c9a84c); color:#0d0d0f; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:10px;">✅ AI Lawyer Shuru Karein</button>
     <p style="color:#555; font-size:10px;">Key sirf aapke browser mein save hogi — file mein nahi</p>
   </div>
 </div>
 
 <script>
-const API_URL = "https://api.anthropic.com/v1/messages";
+const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 let conversationHistory = [];
 let caseMemory = [];
 let currentLang = 'both';
@@ -792,7 +792,7 @@ function getApiKey() { return sessionStorage.getItem('lawyer_ak') || ''; }
 
 function saveApiKey() {
   const k = document.getElementById('apiKeyInput').value.trim();
-  if (!k.startsWith('sk-ant-')) {
+  if (!k.startsWith('gsk_')) {
     document.getElementById('apiKeyError').style.display = 'block';
     return;
   }
@@ -1028,23 +1028,23 @@ async function sendMessage() {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
-          'x-api-key': getApiKey(),
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
+          'Authorization': 'Bearer ' + getApiKey()
         },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1000,
-        system: systemPrompt,
-        messages: conversationHistory
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...conversationHistory
+        ]
       })
     });
 
     const data = await response.json();
     hideTyping();
 
-    if (data.content && data.content[0]) {
-      const reply = data.content[0].text;
+    if (data.choices && data.choices[0]) {
+      const reply = data.choices[0].message.content;
       conversationHistory.push({ role: 'assistant', content: reply });
       addBotMessage(reply);
     } else if (data.error) {
